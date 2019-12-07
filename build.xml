@@ -70,9 +70,9 @@
 
                 echo.setMessage("\n# ["+i+"] clone " + name);
                 echo.perform();
-                echo.setMessage("\ngit clone --mirror" + clone_url);
+                echo.setMessage("\ngit clone --mirror " + clone_url);
                 echo.perform();
-                echo.setMessage("\ncd "+ name + ";git remote update; cd ..\n");
+                echo.setMessage("\ncd "+ name + ".git;git remote update; cd ..\n");
                 echo.perform();
             }
 
