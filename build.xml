@@ -11,13 +11,12 @@
     <echo message="ANT Version: ${antversion}"/>
     <fail message="!!!! ANT VERSION >= 1.10 erforderlich !!!!" unless="antversion"/>
 
-    <property name="github" location="build"/>
 
     <target name="init">
         <!-- Create the time stamp -->
         <tstamp/>
         <!-- Create the build directory structure used by compile -->
-        <mkdir dir="${github}"/>
+        <mkdir dir="github"/>
         <input message="Please enter github personal access token:"
                addproperty="gpa-token"/>
         <echoproperties/>
@@ -27,7 +26,7 @@
             description="create a list or user repos from github">
 
         <get src="https://api.github.com/users/funthomas424242/repos"
-             dest="repoliste.json"
+             dest="github/repoliste.json"
              verbose="true"
              usetimestamp="true">
             <header name="Authorization" value="${gpa-token}"/>
@@ -48,7 +47,7 @@
             importClass(java.io.FileWriter);
             importClass(java.io.BufferedWriter);
 
-            var file = new File("./repoliste.json");
+            var file = new File("./github/repoliste.json");
             fr = new FileReader(file);
             br = new BufferedReader(fr);
 
@@ -59,7 +58,7 @@
             var struct = eval("(" + json + ")");
 
                 echo = ghbackup.createTask("echo");
-                echo.setFile(new File("clonerepos.sh"));
+                echo.setFile(new File("github/clonerepos.sh"));
                 echo.setAppend(true);
                 echo.setMessage("#!/bin/sh\n\n");
                 echo.perform();
