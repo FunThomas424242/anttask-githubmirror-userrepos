@@ -1,4 +1,4 @@
-<project name="ghbackup" default="backup" basedir="." xmlns:ac="antlib:net.sf.antcontrib">
+<project name="ghbackup" default="main" basedir="." xmlns:ac="antlib:net.sf.antcontrib">
     <description>
         Beispiel für das Backup aller Repos eines User von github
     </description>
@@ -36,7 +36,7 @@
         <!--        <ac:var name="varname" value="value"/>-->
     </target>
 
-    <target name="backup" depends="list"
+    <target name="main" depends="list"
             description="generate the distribution">
         <script language="javascript"> <![CDATA[
             // Load compatibility script
