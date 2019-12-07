@@ -1,0 +1,76 @@
+<project name="MyProject" default="backup" basedir=".">
+    <description>
+        Beispiel für das Backup aller Repos eines User von github
+    </description>
+    <property name="github" location="build"/>
+
+    <target name="init">
+        <!-- Create the time stamp -->
+        <tstamp/>
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${github}"/>
+        <input message="Please enter github personal access token:"
+               addproperty="gpa-token"/>
+        <echoproperties/>
+    </target>
+
+    <target name="list" depends="init"
+            description="create a list or user repos from github">
+
+        <get src="https://api.github.com/users/funthomas424242/repos"
+             dest="repoliste.json"
+             verbose="true"
+             usetimestamp="true">
+            <header name="Authorization" value="${gpa-token}"/>
+            <header name="Accept" value="application/vnd.github.full+json"/>
+        </get>
+
+        <script language="javascript"> <![CDATA[
+            // Load compatibility script
+            load("nashorn:mozilla_compat.js");
+            importClass(java.io.File);
+            importClass(java.io.FileReader);
+            importClass(java.io.BufferedReader);
+            importClass(java.io.FileWriter);
+            importClass(java.io.BufferedWriter);
+
+            var file = new File("./repoliste.json");
+            fr = new FileReader(file);
+            br = new BufferedReader(fr);
+
+            // Read the file we just retrieved from the webservice that contains JSON.
+            var json = br.readLine();
+
+            // Evaluate the serialized JSON
+            var struct = eval("(" + json + ")");
+
+            echo = MyProject.createTask("echo");
+            echo.setMessage("Value = " + struct);
+            echo.perform();
+
+
+            // Get the data from
+            var name = struct[0].name;
+            var clone_url = struct[0].clone_url;
+
+            echo = MyProject.createTask("echo");
+            echo.setMessage("name = " + name);
+            echo.perform();
+            echo = MyProject.createTask("echo");
+            echo.setMessage("url = " + clone_url);
+            echo.perform();
+            ]]>
+        </script>
+    </target>
+
+    <target name="backup" depends="list"
+            description="generate the distribution">
+
+    </target>
+
+    <target name="clean"
+            description="clean up">
+        <!-- Delete the ${build} and ${dist} directory trees -->
+        <delete dir="${github}"/>
+    </target>
+</project>
