@@ -1,7 +1,16 @@
-<project name="MyProject" default="backup" basedir=".">
+<project name="ghbackup" default="backup" basedir="." xmlns:ac="antlib:net.sf.antcontrib">
     <description>
         Beispiel für das Backup aller Repos eines User von github
     </description>
+
+    <taskdef uri="antlib:net.sf.antcontrib"
+             resource="net/sf/antcontrib/antlib.xml"
+             classpath="${user.home}/.m2/repository/ant-contrib/ant-contrib/1.0b3/ant-contrib-1.0b3.jar"/>
+
+    <antversion property="antversion" atleast="1.10"/>
+    <echo message="ANT Version: ${antversion}"/>
+    <fail message="!!!! ANT VERSION >= 1.10 erforderlich !!!!" unless="antversion"/>
+
     <property name="github" location="build"/>
 
     <target name="init">
@@ -25,6 +34,11 @@
             <header name="Accept" value="application/vnd.github.full+json"/>
         </get>
 
+        <!--        <ac:var name="varname" value="value"/>-->
+    </target>
+
+    <target name="backup" depends="list"
+            description="generate the distribution">
         <script language="javascript"> <![CDATA[
             // Load compatibility script
             load("nashorn:mozilla_compat.js");
@@ -44,33 +58,32 @@
             // Evaluate the serialized JSON
             var struct = eval("(" + json + ")");
 
-            echo = MyProject.createTask("echo");
-            echo.setMessage("Value = " + struct);
-            echo.perform();
+                echo = ghbackup.createTask("echo");
+                echo.setFile(new File("clonerepos.sh"));
+                echo.setAppend(true);
+                echo.setMessage("#!/bin/sh\n\n");
+                echo.perform();
 
 
-            // Get the data from
-            var name = struct[0].name;
-            var clone_url = struct[0].clone_url;
+            for (i = 0; i < struct.length; i++) {
+                var name = struct[i].name;
+                var clone_url = struct[i].clone_url;
 
-            echo = MyProject.createTask("echo");
-            echo.setMessage("name = " + name);
-            echo.perform();
-            echo = MyProject.createTask("echo");
-            echo.setMessage("url = " + clone_url);
-            echo.perform();
+                echo.setMessage("\n# ["+i+"] clone " + name);
+                echo.perform();
+                echo.setMessage("\ngit clone --mirror" + clone_url);
+                echo.perform();
+                echo.setMessage("\ncd "+ name + ";git remote update; cd ..\n");
+                echo.perform();
+            }
+
             ]]>
         </script>
-    </target>
-
-    <target name="backup" depends="list"
-            description="generate the distribution">
-
     </target>
 
     <target name="clean"
             description="clean up">
         <!-- Delete the ${build} and ${dist} directory trees -->
-        <delete dir="${github}"/>
+        <delete file="clonerepos.sh"/>
     </target>
 </project>
