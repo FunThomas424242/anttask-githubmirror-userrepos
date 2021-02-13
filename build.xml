@@ -1,4 +1,4 @@
-<project name="ghbackup" default="main" basedir="." xmlns:ac="antlib:net.sf.antcontrib">
+<project name="ghbackup" default="main" basedir=".">
     <description>
         Beispiel für das Backup aller Repos eines User von github
     </description>
@@ -7,7 +7,7 @@
              resource="net/sf/antcontrib/antlib.xml"
              classpath="${user.home}/.m2/repository/ant-contrib/ant-contrib/1.0b3/ant-contrib-1.0b3.jar"/>
 
-    <property name="repowoner" value="huluvu424242"/>
+
     <antversion property="antversion" atleast="1.10"/>
     <echo message="ANT Version: ${antversion}"/>
     <fail message="!!!! ANT VERSION >= 1.10 erforderlich !!!!" unless="antversion"/>
@@ -20,6 +20,7 @@
         <mkdir dir="../github"/>
         <input message="Please enter github personal access token:"
                addproperty="gpa-token"/>
+        <property name="repowoner" value="huluvu424242"/>
         <echoproperties/>
     </target>
 
@@ -37,9 +38,17 @@
         <!--        <ac:var name="varname" value="value"/>-->
     </target>
 
-    <target name="main" depends="list"
-            description="generate the distribution">
-        <script language="javascript"> <![CDATA[
+    <target name="main" depends="list">
+        <property name="plugin_classpath" refid="maven.plugin.classpath"/>
+        <generatedist/>
+    </target>
+
+    <scriptdef name="generatedist"
+               description="generate the distribution"
+               language="javascript"
+               classpath="${plugin_classpath}"
+    >
+        <![CDATA[
             // Load compatibility script
             load("nashorn:mozilla_compat.js");
             importClass(java.io.File);
@@ -76,10 +85,8 @@
                 echo.setMessage("\ncd "+ name + ".git;git remote update; cd ..\n");
                 echo.perform();
             }
-
-            ]]>
-        </script>
-    </target>
+        ]]>
+    </scriptdef>
 
     <target name="clean"
             description="clean up">

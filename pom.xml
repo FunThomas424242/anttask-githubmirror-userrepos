@@ -188,7 +188,7 @@
                         </goals>
                         <configuration>
                             <target>
-                                <ant antfile="${basedir}/build.xml"/>
+                                <ant antfile="${basedir}/build.xml" inheritRefs="true"/>
                             </target>
                         </configuration>
                     </execution>
