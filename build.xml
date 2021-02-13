@@ -46,6 +46,7 @@
     <scriptdef name="generatedist"
                description="generate the distribution"
                language="javascript"
+               manager="auto"
                classpath="${plugin_classpath}"
     >
         <![CDATA[
@@ -67,7 +68,7 @@
             // Evaluate the serialized JSON
             var struct = eval("(" + json + ")");
 
-                echo = ghbackup.createTask("echo");
+                echo = project.createTask("echo");
                 echo.setFile(new File("../github/clonerepos.sh"));
                 echo.setAppend(true);
                 echo.setMessage("#!/bin/sh\n\n");
